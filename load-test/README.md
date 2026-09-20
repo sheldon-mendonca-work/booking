@@ -16,6 +16,31 @@ It does not claim a breaking point by itself. Determine the breaking point from 
 
 No pre-created users, event, or JWTs are required.
 
+## 🚀 Performance
+
+The booking API was stress-tested using **k6** with increasing concurrent Virtual Users (VUs).
+
+| Concurrent VUs | Throughput |  p95 Latency | Unexpected Failures |
+| -------------: | ---------: | -----------: | ------------------: |
+|              5 | ~503 req/s |  **12.5 ms** |                  0% |
+|             10 |  ~86 req/s | **134.5 ms** |                  0% |
+|             25 |  ~71 req/s |   **279 ms** |                  0% |
+|             50 |  ~62 req/s |   **507 ms** |                  0% |
+|            100 |  ~57 req/s |   **1.18 s** |                  0% |
+
+### Baseline finding
+
+At **100 concurrent VUs**, p95 latency crossed the configured **1 second** threshold.
+
+Importantly, the system remained functionally correct throughout the test:
+
+* **0% unexpected failures**
+* No ticket overselling
+* Successful bookings never exceeded event capacity
+* Concurrent inventory updates remained consistent
+
+The primary bottleneck is contention on the event's `availableTickets` row, which currently uses **PostgreSQL pessimistic row-level locking**.
+
 ## Run
 
 From the project root:
