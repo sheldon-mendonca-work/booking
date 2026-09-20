@@ -53,7 +53,7 @@ public class BookingEntity {
     @Min(1)
     private Integer quantity;
 
-    @NotBlank
+    @NotNull
     @Enumerated(EnumType.STRING)
     private BookingStatusEnum status;
 

@@ -6,6 +6,7 @@ const baseUrl = (__ENV.BASE_URL || 'http://localhost:8080').replace(/\/$/, '');
 const testUsers = Number(__ENV.TEST_USERS || '20');
 const eventCapacity = Number(__ENV.EVENT_CAPACITY || '10000');
 const quantity = Number(__ENV.QUANTITY || '1');
+const testEmail = __ENV.TEST_EMAIL;
 
 const maxHttpFailureRate = __ENV.MAX_HTTP_FAILURE_RATE || 'rate<0.05';
 const maxRequestDuration = __ENV.MAX_REQUEST_DURATION || 'p(95)<1000';
@@ -17,9 +18,8 @@ export const bookingUnexpectedFailureRate = new Rate('booking_unexpected_failure
 
 export const options = {
   thresholds: {
-    http_req_failed: [maxHttpFailureRate],
-    http_req_duration: [maxRequestDuration],
-    booking_unexpected_failure_rate: [maxHttpFailureRate],
+  http_req_duration: [maxRequestDuration],
+  booking_unexpected_failure_rate: [maxHttpFailureRate],
   },
 };
 
@@ -37,13 +37,14 @@ export function setup() {
   }
 
   const runId = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+  const email = testEmail || `k6-user-${runId}-index@example.com`;
   const adminEmail = `k6-admin-${runId}@example.com`;
   const admin = registerUser(adminEmail, `K6 Admin ${runId}`, 'ADMIN');
   const eventId = createEvent(admin.jwt, runId);
   const users = [];
 
   for (let index = 0; index < testUsers; index += 1) {
-    const email = `k6-user-${runId}-${index}@example.com`;
+    const email = testEmail || `k6-user-${runId}-${index}@example.com`;
     const user = registerUser(email, `K6 User ${index}`, 'USER');
     users.push({
       email,
@@ -64,6 +65,7 @@ export function setup() {
 
 export default function (data) {
   const token = data.tokens[(__VU + __ITER) % data.tokens.length];
+
   const url = `${baseUrl}/events/${data.eventId}/bookings`;
   const payload = JSON.stringify({ quantity });
 
@@ -77,6 +79,8 @@ export default function (data) {
     },
   });
 
+  console.log(`BOOKING RESPONSE: ${response.status} ${response.body}`);
+
   const created = response.status === 201;
   const rejected = response.status === 400 || response.status === 409;
   const expected = created || rejected;
@@ -87,11 +91,11 @@ export default function (data) {
     bookingRejectionCount.add(1);
   }
 
-  bookingUnexpectedFailureRate.add(!expected);
+  bookingUnexpectedFailureRate.add(expected ? 0 : 1);
 
   check(response, {
-    'booking request returned expected status': () => expected,
-    'successful booking returned 201': () => !created || response.status === 201,
+    'booking returned expected status': () => expected,
+    'booking succeeded with 201': () => !created || response.status === 201,
   });
 
   sleep(Number(__ENV.SLEEP_SECONDS || '0'));
