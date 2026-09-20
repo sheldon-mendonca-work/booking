@@ -1,0 +1,75 @@
+ BASE_URL=http://localhost:8080 TEST_USERS=1 TEST_EMAIL=resend@sheldonmendonca.com EVENT_CAPACITY=10 k6 run --vus 1 --iterations 1 load-test/booking-load-test.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: load-test/booking-load-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
+              * default: 1 iterations shared among 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
+
+INFO[0000] Created load-test event 16 with 1 test users.  source=console
+INFO[0000] BOOKING RESPONSE: 201 {"message":"Booking Created Successfully","statusCode":201,"data":{"id":110,"eventId":16,"customerId":136,"quantity":1,"status":"SUCCESSFUL","createdAt":"2026-09-20T13:10:04.858958Z","updatedAt":"2026-09-20T13:10:04.858985Z"}}  source=console
+INFO[0000]                                               source=console
+INFO[0000] === Manual cleanup information ===            source=console
+INFO[0000] Event ID: 16                                  source=console
+INFO[0000] Admin email: k6-admin-1789909804609-705576@example.com  source=console
+INFO[0000] Admin JWT: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMzUiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODk5MDk4MDQsImV4cCI6MTc4OTkxMzQwNH0.iawj7PC0Yln-BqpfjL1CaKcZShthPaM_wqfwfQKJc3i9TL0DWq8qAoyGZaqYPTXg  source=console
+INFO[0000] User emails: resend@sheldonmendonca.com       source=console
+INFO[0000]                                               source=console
+INFO[0000] Cleanup steps:                                source=console
+INFO[0000] 1. Delete the event with DELETE http://localhost:8080/events/16 using the admin JWT above.  source=console
+INFO[0000] 2. If you need to remove test users, delete rows for the listed emails from the users table.  source=console
+INFO[0000] 3. If you need to remove test bookings, delete rows from bookings where event_id matches the event ID above.  source=console
+INFO[0000] 4. If using the outbox/Redis notification pipeline during tests, clear related test outbox rows and Redis queues if desired.  source=console
+INFO[0000] ==================================            source=console
+
+
+  █ THRESHOLDS 
+
+    booking_unexpected_failure_rate
+    ✓ 'rate<0.05' rate=0.00%
+
+    http_req_duration
+    ✓ 'p(95)<1000' p(95)=105.57ms
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2       6.829963/s
+    checks_succeeded...: 100.00% 2 out of 2
+    checks_failed......: 0.00%   0 out of 2
+
+    ✓ booking returned expected status
+    ✓ booking succeeded with 201
+
+    CUSTOM
+    booking_success_count.............: 1      3.414981/s
+    booking_unexpected_failure_rate...: 0.00%  0 out of 1
+
+    HTTP
+    http_req_duration.................: avg=71.95ms min=18.71ms med=80.2ms  max=108.69ms p(90)=102.45ms p(95)=105.57ms
+      { expected_response:true }......: avg=71.95ms min=18.71ms med=80.2ms  max=108.69ms p(90)=102.45ms p(95)=105.57ms
+    http_req_failed...................: 0.00%  0 out of 4
+    http_reqs.........................: 4      13.659926/s
+
+    EXECUTION
+    iteration_duration................: avg=73.43ms min=73.43ms med=73.43ms max=73.43ms  p(90)=73.43ms  p(95)=73.43ms 
+    iterations........................: 1      3.414981/s
+
+    NETWORK
+    data_received.....................: 2.5 kB 8.5 kB/s
+    data_sent.........................: 1.4 kB 4.8 kB/s
+
+
+
+
+running (00m00.3s), 0/1 VUs, 1 complete and 0 interrupted iterations
+default ✓ [======================================] 1 VUs  00m00.1s/10m0s  1/1 shared iters
+

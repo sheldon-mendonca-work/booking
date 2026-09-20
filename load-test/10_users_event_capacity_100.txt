@@ -1,3 +1,53 @@
+INFO[0011] ==================================            source=console
+
+
+  █ THRESHOLDS 
+
+    booking_unexpected_failure_rate
+    ✓ 'rate<0.05' rate=0.00%
+
+    http_req_duration
+    ✓ 'p(95)<1000' p(95)=12.52ms
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 11184   1003.315658/s
+    checks_succeeded...: 100.00% 11184 out of 11184
+    checks_failed......: 0.00%   0 out of 11184
+
+    ✓ booking returned expected status
+    ✓ booking succeeded with 201
+
+    CUSTOM
+    booking_rejection_count...........: 5492   492.686838/s
+    booking_success_count.............: 100    8.970991/s
+    booking_unexpected_failure_rate...: 0.00%  0 out of 5592
+
+    HTTP
+    http_req_duration.................: avg=8.57ms  min=3.98ms  med=6.74ms  max=125.81ms p(90)=10.46ms p(95)=12.52ms 
+      { expected_response:true }......: avg=68.73ms min=19.56ms med=65.42ms max=125.81ms p(90)=93.19ms p(95)=116.39ms
+    http_req_failed...................: 98.00% 5492 out of 5604
+    http_reqs.........................: 5604   502.734348/s
+
+    EXECUTION
+    iteration_duration................: avg=8.92ms  min=4.41ms  med=7.24ms  max=126.38ms p(90)=11.04ms p(95)=13.08ms 
+    iterations........................: 5592   501.657829/s
+    vus...............................: 5      min=0            max=5
+    vus_max...........................: 5      min=5            max=5
+
+    NETWORK
+    data_received.....................: 2.1 MB 187 kB/s
+    data_sent.........................: 1.9 MB 173 kB/s
+
+
+
+
+running (11.1s), 0/5 VUs, 5592 complete and 0 interrupted iterations
+default ✓ [======================================] 5 VUs  10s
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 BASE_URL=http://localhost:8080 TEST_USERS=10  EVENT_CAPACITY=100 k6 run --vus 5 --duration 10s load-test/booking-load-test.js
 
          /\      Grafana   /‾‾/  
